@@ -64,7 +64,7 @@ class Bike extends Vehicle {
 public class solutions {
 
     public static void main(String[] args) {
-
+        
         // Polymorphism (Parent reference, Child object)
         Vehicle v1 = new Car("Toyota");
         Vehicle v2 = new Bike("Yamaha");
