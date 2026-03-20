@@ -1,81 +1,193 @@
-// Demonstration of OOP Concepts in Java
-// Concepts covered: Encapsulation, Inheritance, Polymorphism, Abstraction
+// Demonstration of OOP + SOLID Principles
+// Concepts: Encapsulation, Abstraction, Inheritance, Polymorphism + SOLID
 
 // --------------------
+// QUESTION 1: SMART HOME SYSTEM
+// --------------------
+
 // ABSTRACTION
-// --------------------
-abstract class Animal {
-    private String name;  // Encapsulation
+abstract class Device {
+    private String deviceName;   // Encapsulation
+    private boolean powerStatus;
 
-    public Animal(String name) {
-        this.name = name;
+    public Device(String deviceName) {
+        this.deviceName = deviceName;
+        this.powerStatus = false;
     }
 
-    public String getName() {   // Getter (Encapsulation)
-        return name;
+    // Getters and Setters (Encapsulation)
+    public String getDeviceName() {
+        return deviceName;
     }
 
-    public void setName(String name) {  // Setter (Encapsulation)
-        this.name = name;
+    public boolean isPowerOn() {
+        return powerStatus;
     }
 
-    // Abstract method (must be implemented by subclasses)
-    public abstract void makeSound();
-
-    public void eat() {
-        System.out.println(name + " is eating.");
+    public void turnOn() {
+        powerStatus = true;
     }
+
+    public void turnOff() {
+        powerStatus = false;
+    }
+
+    // Abstract method (Polymorphism)
+    public abstract void displayStatus();
 }
 
-// --------------------
 // INHERITANCE
+class Light extends Device {
+
+    public Light(String name) {
+        super(name);
+    }
+
+    // POLYMORPHISM
+    @Override
+    public void displayStatus() {
+        System.out.println(getDeviceName() + " Light is " +
+                (isPowerOn() ? "ON" : "OFF"));
+    }
+}
+
+class Thermostat extends Device {
+    private int temperature;
+
+    public Thermostat(String name, int temp) {
+        super(name);
+        this.temperature = temp;
+    }
+
+    // POLYMORPHISM
+    @Override
+    public void displayStatus() {
+        System.out.println(getDeviceName() + " Thermostat is " +
+                (isPowerOn() ? "ON" : "OFF") +
+                " | Temp: " + temperature + "°C");
+    }
+}
+
+
 // --------------------
-class Dog extends Animal {
+// QUESTION 2: PAYMENT SYSTEM (SOLID)
+// --------------------
 
-    public Dog(String name) {
-        super(name);
-    }
+// INTERFACE (DIP)
+interface PaymentMethod {
+    void processPayment(double amount);
+}
 
-    // POLYMORPHISM (Method Overriding)
-    @Override
-    public void makeSound() {
-        System.out.println(getName() + " says: Woof!");
+// IMPLEMENTATIONS (OCP)
+class CreditCardPayment implements PaymentMethod {
+    public void processPayment(double amount) {
+        System.out.println("Payment of ₹" + amount + " done using Credit Card");
     }
 }
 
-class Cat extends Animal {
-
-    public Cat(String name) {
-        super(name);
-    }
-
-    // POLYMORPHISM (Method Overriding)
-    @Override
-    public void makeSound() {
-        System.out.println(getName() + " says: Meow!");
+class PayPalPayment implements PaymentMethod {
+    public void processPayment(double amount) {
+        System.out.println("Payment of ₹" + amount + " done using PayPal");
     }
 }
+
+class UPIPayment implements PaymentMethod {
+    public void processPayment(double amount) {
+        System.out.println("Payment of ₹" + amount + " done using UPI");
+    }
+}
+
+// DEPENDS ON INTERFACE (DIP)
+class PaymentProcessor {
+    public void makePayment(PaymentMethod method, double amount) {
+        method.processPayment(amount);
+    }
+}
+
+
+// --------------------
+// QUESTION 3: NOTIFICATION SYSTEM (SOLID)
+// --------------------
+
+// ISP: Small interfaces
+interface EmailSender {
+    void sendEmail(String message);
+}
+
+interface SMSSender {
+    void sendSMS(String message);
+}
+
+interface PushNotificationSender {
+    void sendPushNotification(String message);
+}
+
+// SRP: One responsibility per class
+class EmailNotification implements EmailSender {
+    public void sendEmail(String message) {
+        System.out.println("Email: " + message);
+    }
+}
+
+class SMSNotification implements SMSSender {
+    public void sendSMS(String message) {
+        System.out.println("SMS: " + message);
+    }
+}
+
+class MobileAppNotification implements PushNotificationSender {
+    public void sendPushNotification(String message) {
+        System.out.println("Push Notification: " + message);
+    }
+}
+
 
 // --------------------
 // MAIN CLASS
 // --------------------
+
 public class OOPSSimpleDemo {
 
     public static void main(String[] args) {
 
-        // Polymorphism (Parent reference, Child object)
-        Animal dog = new Dog("Buddy");
-        Animal cat = new Cat("Whiskers");
+        // -------- QUESTION 1 --------
+        System.out.println("---- Smart Home Devices ----");
 
-        dog.makeSound();
-        cat.makeSound();
+        Device light = new Light("Hall");
+        Device thermostat = new Thermostat("Bedroom", 24);
 
-        dog.eat();
-        cat.eat();
+        light.turnOn();
+        thermostat.turnOn();
 
-        System.out.println("---- Changing name using Encapsulation ----");
+        light.displayStatus();
+        thermostat.displayStatus();
 
-        dog.setName("Rocky");
-        dog.makeSound();
+        light.turnOff();
+        light.displayStatus();
+
+
+        // -------- QUESTION 2 --------
+        System.out.println("\n---- Payment Processing ----");
+
+        PaymentProcessor processor = new PaymentProcessor();
+
+        PaymentMethod card = new CreditCardPayment();
+        PaymentMethod upi = new UPIPayment();
+
+        processor.makePayment(card, 2000);
+        processor.makePayment(upi, 750);
+
+
+        // -------- QUESTION 3 --------
+        System.out.println("\n---- Notification System ----");
+
+        EmailSender email = new EmailNotification();
+        email.sendEmail("Welcome User!");
+
+        SMSSender sms = new SMSNotification();
+        sms.sendSMS("Your OTP is 5678");
+
+        PushNotificationSender push = new MobileAppNotification();
+        push.sendPushNotification("New message received");
     }
 }
